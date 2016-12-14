@@ -1,0 +1,31 @@
+{
+  "name": "whats-a-virus",
+  "version": "0.0.1",
+  "description": "Whats this, a virus? Scanner built for whats-th.is file uploader.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/whats-this/scanner.git"
+  },
+  "keywords": [
+    "av",
+    "antivirus",
+    "clamscan",
+    "clamav"
+  ],
+  "author": "aurieh",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/whats-this/scanner/issues"
+  },
+  "homepage": "https://github.com/whats-this/scanner#readme",
+  "devDependencies": {
+    "eslint": "^3.12.1",
+    "eslint-config-standard": "^6.2.1",
+    "eslint-plugin-promise": "^3.4.0",
+    "eslint-plugin-standard": "^2.0.1"
+  }
+}
