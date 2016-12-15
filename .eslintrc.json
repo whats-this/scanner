@@ -6,6 +6,6 @@
         "promise"
     ],
     "rules": {
-        "semi": "always"
+        "semi": [2, "always"]
     }
 }
