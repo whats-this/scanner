@@ -23,11 +23,15 @@ RUN freshclam
 COPY index.js src/
 COPY package.json src/
 COPY lib/ src/lib
+COPY routes/ src/routes
 
 WORKDIR src/
 
 # update NPM dependencies
 RUN npm install
+
+# expose port 8080 for health checks
+EXPOSE 8080
 
 # start the consumer
 CMD ["node", "index.js"]
