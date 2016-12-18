@@ -1,7 +1,7 @@
 {
-  "name": "whats-a-virus",
+  "name": "s3-scanner",
   "version": "0.0.1",
-  "description": "Whats this, a virus? Scanner built for whats-th.is file uploader.",
+  "description": "Node.js microservice to process events from S3 over SNS and scan new objects.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -14,22 +14,29 @@
     "av",
     "antivirus",
     "clamscan",
-    "clamav"
+    "clamav",
+    "s3",
+    "simple storage service",
+    "simple-storage-service",
+    "aws",
+    "amazon web services",
+    "amazon-web-services"
   ],
-  "author": "aurieh",
+  "author": "Aurieh",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/whats-this/scanner/issues"
   },
   "homepage": "https://github.com/whats-this/scanner#readme",
+  "dependencies": {
+    "aws-sdk": "^2.7.15",
+    "clamscan": "^0.8.4",
+    "debug": "^2.4.4"
+  },
   "devDependencies": {
     "eslint": "^3.12.1",
     "eslint-config-standard": "^6.2.1",
     "eslint-plugin-promise": "^3.4.0",
     "eslint-plugin-standard": "^2.0.1"
-  },
-  "dependencies": {
-    "clamscan": "^0.8.4",
-    "debug": "^2.4.4"
   }
 }

@@ -1,11 +1,11 @@
 {
-    "extends": "standard",
-    "installedESLint": true,
-    "plugins": [
-        "standard",
-        "promise"
-    ],
-    "rules": {
-        "semi": [2, "always"]
-    }
+  "extends": "standard",
+  "installedESLint": true,
+  "plugins": [
+    "standard",
+    "promise"
+  ],
+  "rules": {
+    "semi": [2, "always"]
+  }
 }
