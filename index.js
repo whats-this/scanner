@@ -72,8 +72,8 @@ app.use(route.get('/freshclam', require('./routes/freshclam.js')));
  * Return a 200 OK response, so that Elastic Beanstalk can check if the server
  * is still online.
  */
-app.use(route.get('/health', (req, res, next) => {
-  res.status(200).end();
+app.use(route.get('/health', () => {
+  this.status = 200;
 }));
 
 // Listen on 8080
