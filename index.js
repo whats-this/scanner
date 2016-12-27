@@ -1,5 +1,5 @@
 // Required modules
-const express = require('express');
+const koa = require('koa');
 
 // Check for required environment variables
 for (let env of [
@@ -13,39 +13,44 @@ for (let env of [
   }
 }
 
-// Create Express app
-const app = express();
-app.disable('x-powered-by');
-app.disable('etag');
+// Create Koa app
+const app = koa();
+const route = require("koa-route");
 
 /**
  * Parse request body.
  */
-app.use((req, res, next) => {
+app.use(next => {
   if (req.method === 'GET' || req.method === 'DELETE') {
-    return next();
+    yield next;
+    return;
   }
-  if (!req.is('application/json')) {
-    return res.status(400).json({
+  if (!this.headers['application/json']) {
+    this.status = 400;
+    this.body = {
       code: 400,
       message: 'invalid content type, should be application/json'
-    });
+    };
+    yield next;
+    return;
   }
 
   let rawData = '';
 
-  req.on('data', chunk => {
+  this.req.on('data', chunk => {
     rawData += chunk.toString();
   });
-  req.on('end', () => {
+  this.req.on('end', () => {
     try {
-      req.body = JSON.parse(rawData);
-      next();
+      this.req.body = JSON.parse(rawData);
+      yield next;
+      return;
     } catch (err) {
-      res.status(400).json({
+      this.body = {
         code: 400,
         message: 'invalid body data, should be a valid JSON string'
-      });
+      };
+      this.status = 400;
     }
   });
 });
@@ -54,22 +59,22 @@ app.use((req, res, next) => {
  * POST /scan
  * Scan the file specified in the S3 event in the body.
  */
-app.post('/scan', require('./routes/scan.js'));
+app.use(route.post('/scan', require('./routes/scan.js')));
 
 /**
  * GET /freshclam
  * Run freshclam to update the virus database.
  */
-app.get('/freshclam', require('./routes/freshclam.js'));
+app.use(route.get('/freshclam', require('./routes/freshclam.js')));
 
 /**
  * GET /health
  * Return a 200 OK response, so that Elastic Beanstalk can check if the server
  * is still online.
  */
-app.get('/health', (req, res, next) => {
+app.use(route.get('/health', (req, res, next) => {
   res.status(200).end();
-});
+}));
 
 // Listen on 8080
 app.listen(8080);
