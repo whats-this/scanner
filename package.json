@@ -35,9 +35,9 @@
     "express": "^4.14.0"
   },
   "devDependencies": {
-    "eslint": "^3.12.1",
+    "eslint": "^3.12.2",
     "eslint-config-standard": "^6.2.1",
-    "eslint-plugin-promise": "^3.4.0",
-    "eslint-plugin-standard": "^2.0.1"
+    "eslint-plugin-promise": "github:xjamundx/eslint-plugin-promise",
+    "eslint-plugin-standard": "github:xjamundx/eslint-plugin-standard"
   }
 }
