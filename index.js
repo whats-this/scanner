@@ -15,13 +15,34 @@ for (let env of [
 
 // Create Koa app
 const app = koa();
-const route = require("koa-route");
+const route = require('koa-route');
+
+// Error handler
+app.use(function* (next) {
+  try {
+    yield next;
+  } catch (err) {
+    if (err.isBoom) {
+      this.status = err.output.statusCode || 500;
+      this.body = err.output.payload || '';
+      this.set('content-type', 'application/json; charset=utf-8');
+      for (const header in err.output.headers || {}) {
+        this.set(header, err.output.headers[header]);
+      }
+    } else {
+      this.status = err.status || 500;
+      this.body = err.message || '';
+    }
+
+    if (this.status > 499) this.app.emit('error', err, this);
+  }
+});
 
 /**
  * Parse request body.
  */
-app.use(next => {
-  if (req.method === 'GET' || req.method === 'DELETE') {
+app.use(function* (next) {
+  if (this.req.method === 'GET' || this.req.method === 'DELETE') {
     yield next;
     return;
   }
@@ -43,7 +64,7 @@ app.use(next => {
   this.req.on('end', () => {
     try {
       this.req.body = JSON.parse(rawData);
-      yield next;
+      next();
       return;
     } catch (err) {
       this.body = {
