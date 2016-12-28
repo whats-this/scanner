@@ -128,13 +128,13 @@ module.exports = function* scan () {
   debug('received data from SQS');
 
   // Reject incoming data
-  function rejectData (msg) {
+  const rejectData = msg => {
     this.status = 400;
     this.body = {
       code: 400,
       message: msg
     };
-  }
+  };
 
   // Test incoming data
   if (this.req.body.Event === 's3:TestEvent') return rejectData('test event');
