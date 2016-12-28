@@ -124,53 +124,55 @@ function fireInfectedNotification (data) {
  * > POST /scan
  * Scan the file specified in the S3 event in the body.
  */
-module.exports = function scan (req, res, next) {
+module.exports = function* scan () {
   debug('received data from SQS');
 
   // Reject incoming data
   function rejectData (msg) {
-    res.status(400).json({
+    this.status = 400;
+    this.body = {
       code: 400,
       message: msg
-    });
+    };
   }
 
   // Test incoming data
-  if (req.body.Event === 's3:TestEvent') return rejectData('test event');
-  if (!Array.isArray(req.body.Records)) return rejectData('invalid S3 message structure');
-  if (req.body.Records.length !== 1) return rejectData('records count !== 1');
-  for (const item of req.body.Records) {
+  if (this.req.body.Event === 's3:TestEvent') return rejectData('test event');
+  if (!Array.isArray(this.req.body.Records)) return rejectData('invalid S3 message structure');
+  if (this.req.body.Records.length !== 1) return rejectData('records count !== 1');
+  for (const item of this.req.body.Records) {
     if (typeof item !== 'object' || item === null) return rejectData('invalid item in records');
     if (typeof item.eventName !== 'string' || item.eventName.indexOf('ObjectCreated') === -1) return rejectData('invalid event type on record');
   }
 
   // Promise chain for processing the scan
-  Promise.resolve(req.body)
-    .then(getObject)
-    .then(writeTempFile)
-    .then(clamScan)
-    // TODO: .then(uploadInfectedToS3)
-    .then(unlinkTempFile)
-    .then(deleteInfectedFromS3)
-    .then(fireInfectedNotification)
-    .then(data => {
-      res.status(200).json({
-        processed: true,
-        infected: data.isInfected || false,
-        permanentlyDeleted: data.wasPermanentlyDeleted || false
-      });
-    })
-    .catch(err => {
-      console.error(err.stack);
-      res.status(500).json({
-        code: 500,
-        message: 'internal server error',
-        data: {
-          type: err.type,
-          name: err.name,
-          arguments: err.arguments,
-          message: err.message
-        }
-      });
-    });
+  try {
+    const data = yield Promise.resolve(this.req.body)
+      .then(getObject)
+      .then(writeTempFile)
+      .then(clamScan)
+      // TODO: .then(uploadInfectedToS3)
+      .then(unlinkTempFile)
+      .then(deleteInfectedFromS3)
+      .then(fireInfectedNotification);
+    this.status = 200;
+    this.body = {
+      processed: true,
+      infected: data.isInfected || false,
+      permanentlyDeleted: data.wasPermanentlyDeleted || false
+    };
+  } catch (err) {
+    console.error(err.stack);
+    this.status = 500;
+    this.body = {
+      code: 500,
+      message: 'internal server error',
+      data: {
+        type: err.type,
+        name: err.name,
+        arguments: err.arguments,
+        message: err.message
+      }
+    };
+  }
 };
