@@ -46,34 +46,37 @@ app.use(function* (next) {
     yield next;
     return;
   }
-  if (!this.headers['application/json']) {
+  if (this.headers['content-type'] || !~this.headers['content-type'].indexOf('application/json')) {
     this.status = 400;
     this.body = {
       code: 400,
       message: 'invalid content type, should be application/json'
     };
-    yield next;
-    return;
+    return yield next;
   }
 
-  let rawData = '';
-
-  this.req.on('data', chunk => {
-    rawData += chunk.toString();
-  });
-  this.req.on('end', () => {
-    try {
-      this.req.body = JSON.parse(rawData);
-      next();
-      return;
-    } catch (err) {
-      this.body = {
-        code: 400,
-        message: 'invalid body data, should be a valid JSON string'
-      };
-      this.status = 400;
-    }
-  });
+  try {
+    const body = yield new Promise((resolve, reject) => {
+      let rawData = '';
+      this.req.on('data', chunk => {
+        rawData += chunk.toString();
+      });
+      this.req.on('end', () => {
+        try {
+          resolve(JSON.parse(rawData));
+        } catch (err) {
+          reject({
+            code: 400,
+            message: 'invalid body data, should be a valid JSON string'
+          });
+        }
+      });
+    });
+    this.req.body = body;
+  } catch (e) {
+    this.status = 400;
+    this.body = e;
+  }
 });
 
 /**
