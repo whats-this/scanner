@@ -1,6 +1,6 @@
 {
   "name": "s3-scanner",
-  "version": "3.0.1",
+  "version": "3.0.4",
   "description": "Node.js microservice to process events from S3 over SNS and scan new objects.",
   "main": "index.js",
   "scripts": {
@@ -32,7 +32,8 @@
     "aws-sdk": "^2.7.15",
     "clamscan": "^0.8.4",
     "debug": "^2.4.4",
-    "koa": "^1.2.4"
+    "koa": "^1.2.4",
+    "koa-route": "^2.4.2"
   },
   "devDependencies": {
     "eslint": "^3.12.2",
