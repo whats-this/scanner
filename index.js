@@ -46,13 +46,13 @@ app.use(function* (next) {
     yield next;
     return;
   }
-  if (this.headers['content-type'] || !~this.headers['content-type'].indexOf('application/json')) {
+  if (!this.headers['content-type'] || !~this.headers['content-type'].indexOf('application/json')) {
     this.status = 400;
     this.body = {
       code: 400,
       message: 'invalid content type, should be application/json'
     };
-    return yield next;
+    return;
   }
 
   try {
@@ -73,9 +73,11 @@ app.use(function* (next) {
       });
     });
     this.req.body = body;
+    yield next;
   } catch (e) {
     this.status = 400;
     this.body = e;
+    return;
   }
 });
 
